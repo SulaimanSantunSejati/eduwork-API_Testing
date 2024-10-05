@@ -30,19 +30,36 @@
 // cypress/e2e/jsonPlaceholder.spec.js
 
 
-Cypress.Commands.add('loginByApi', (email, password) => {
-  cy.request('POST', `${Cypress.env('apiUrl')}/api/login`, { 
-    username: email,
-    password,
-  }).then((response) => {
+// Cypress.Commands.add('loginByApi', (email, password) => {
+//   cy.request('POST', `${Cypress.env('apiUrl')}/api/login`, { 
+//     username: email,
+//     password,
+//   }).then((response) => {
     
-    expect(response.status).to.eq(200)
+//     expect(response.status).to.eq(200)
  
-    cy.setCookie('sessionId', response.body.token) 
-    cy.setCookie('userId', response.body.id || 'defaultUserId') 
-    cy.setCookie('userName', response.body.userName || 'defaultUserName') 
+//     cy.setCookie('sessionId', response.body.token) 
+//     cy.setCookie('userId', response.body.id || 'defaultUserId') 
+//     cy.setCookie('userName', response.body.userName || 'defaultUserName') 
 
-    cy.visit('/#!/main')
+//     cy.visit('/#!/main')
+//   })
+// })
+
+Cypress.Commands.add('LoginViaAPI', (email = 'admin', password = 'admin') => {
+  const encodedCredentials = btoa(`${email}:${password}`);
+
+  cy.request({
+      method: 'GET',
+      url: 'https://admin:admin@the-internet.herokuapp.com/basic_auth',
+      headers: {
+          'Authorization': `Basic ${encodedCredentials}`
+      }
+  }).then((res) => {
+      expect(res.status).to.eq(200)
+
+      cy.setCookie('authToken', encodedCredentials);
+      cy.url().should('contain', 'basic_auth')
   })
 })
 

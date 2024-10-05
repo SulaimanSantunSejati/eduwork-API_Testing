@@ -1,18 +1,19 @@
-describe('Login via API', () => {
-    it('should log in and set the token in cookies', () => {
-
-      cy.loginByApi('eve.holt@reqres.in', 'cityslicka')
-  
-      cy.getCookie('sessionId').should('exist') 
-      cy.getCookie('userId').should('exist')   
-      cy.getCookie('userName').should('exist') 
-  
-     
-    })
-    it('should log in and redirect to the main page', () => {
-
-      cy.loginByApi('eve.holt@reqres.in', 'cityslicka');
-  
-      cy.url().should('include', '/#!/main')
+describe('Basic Auth', () => {
+    it('Successfully login by appending username and password in URL', () => {
+        cy.visit('https://admin:admin@the-internet.herokuapp.com/basic_auth')
+        cy.get('p').should('include.text', 'Congratulations! You must have the proper credentials.')
     });
-  })
+
+    it('Successfully login using headers', () => {
+        cy.visit('https://the-internet.herokuapp.com/basic_auth', {
+            headers:{
+                authorization: 'Basic YWRtaW46YWRtaW4='
+            },
+            failOnStatusCode: false
+        });
+        
+        cy.LoginViaAPI('admin', 'admin')
+        cy.get('p').should('contain.text', 'Congratulations! You must have the proper credentials.')
+
+    });
+});
